@@ -6,6 +6,11 @@ and forwards newly logged QSOs to:
 - **OpenHamClock** via HTTP (map overlay ingest)
 - **Time Mapper UHD** via UDP (logger feed)
 
+> This bridge was originally created to feed **Time Mapper UHD** via UDP, and now also supports
+> OpenHamClock via HTTP.
+
+---
+
 ## Features
 
 - Monitors N3FJP Entry fields (callsign / grid)
@@ -13,7 +18,9 @@ and forwards newly logged QSOs to:
 - Reads band, mode, and frequency
 - Sends QSOs to OpenHamClock (optional)
 - Sends UDP logger packets to Time Mapper UHD (optional)
-- Designed for LAN use (bridge and targets on same network)
+- Designed for LAN use (bridge and targets on the same network)
+
+---
 
 ## Requirements
 
@@ -23,25 +30,13 @@ and forwards newly logged QSOs to:
 - OpenHamClock (optional)
 - Time Mapper UHD (optional)
 
+---
+
 ## Quick Start
 
 1. Copy `config.json.example` → `config.json`
 2. Edit values for your station and network
 3. Run manually:
+
+   ```bash
    python n3fjp_to_timemapper_udp.py
-4. (Optional) Use the included installer scripts to run hidden at startup
-
-See INSTALL_INSTRUCTIONS.txt for detailed setup steps.
-
-OpenHamClock Integration
-
-This bridge supports an OpenHamClock overlay that displays recently logged QSOs on the map.
-The corresponding OpenHamClock changes are provided separately.
-
-Credits
-
-Time Mapper UHD — Original motivation for this bridge via UDP logger feed
-
-OpenHamClock — HTTP ingest endpoint and map overlay support
-
-N3FJP Logger — Source of QSO data via TCP API
