@@ -1,0 +1,14 @@
+﻿{
+  "N3FJP_HOST": "192.168.1.43",
+  "N3FJP_PORT": 1100,
+
+  "UDP_HOST": "127.0.0.1",
+  "UDP_PORT": 12060,
+
+  "ENABLE_OHC_HTTP": true,
+  "OHC_BASE_URL": "http://localhost:3000",
+
+  "MYCALL": "",
+  "LOG_FILE": "bridge.log",
+  "HTTP_TIMEOUT_SECONDS": 10
+}

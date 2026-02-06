@@ -1,0 +1,12 @@
+﻿# Runtime files
+config.json
+bridge.log
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+.env
