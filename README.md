@@ -101,6 +101,8 @@ de_call (if configured)
 
 If QSOs are not plotting even though UDP packets are arriving, enabling HTTP mode is recommended.
 
+Note: UDP output is still sent even when HTTP mode is enabled. Enabling HTTP allows OpenHamClock to receive additional fields (such as dx_grid when available) that may be required for plotting in some setups.
+
 Troubleshooting: QSOs Not Plotting
 
 If:
