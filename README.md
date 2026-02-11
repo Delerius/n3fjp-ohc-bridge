@@ -123,7 +123,6 @@ Look for this line in bridge.log:
 
 [OHC] POST ok -> http://<OHC_BASE_URL>/api/n3fjp/qso
 
-
 If you see an HTTP error instead, that message will indicate what needs adjustment.
 
 Optional (Highly Recommended Addition)
@@ -142,3 +141,12 @@ FREQ=0.0
 When this occurs, the bridge will skip sending the QSO.
 
 Ensure N3FJP has active CAT/rig control configured at log time.
+
+Copy config.json.example → config.json
+
+Choose one of the example configs:
+- config.ohc.example.json (recommended for OpenHamClock)
+- config.udp-only.example.json (Time Mapper only)
+
+Copy the file you want to use to:
+config.json
