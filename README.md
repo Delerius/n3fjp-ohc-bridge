@@ -40,3 +40,53 @@ and forwards newly logged QSOs to:
 
    ```bash
    python n3fjp_to_timemapper_udp.py
+
+Output Modes: UDP vs HTTP (Important)
+
+The bridge supports two independent output paths:
+1) UDP (Always Enabled)
+The bridge sends a minimal N1MM-style <contactinfo> packet to:
+UDP_DEST_IP : UDP_DEST_PORT
+
+This packet includes:
+Callsign
+Band
+Frequency
+Mode
+My Call
+
+Note: The UDP payload does not include DX grid information.
+If your OpenHamClock instance relies on grid or location data to plot QSOs, UDP alone may not be sufficient.
+
+2) Optional HTTP POST to OpenHamClock
+If:
+
+"ENABLE_OHC_HTTP": true
+
+The bridge will also POST structured JSON directly to:
+http://<OHC_BASE_URL>/api/n3fjp/qso
+
+This payload includes:
+dx_call
+band_mhz
+freq_khz
+mode
+dx_grid (when available)
+de_call (if configured)
+
+If QSOs are not plotting even though UDP packets are arriving, enabling HTTP mode is recommended.
+
+Troubleshooting: QSOs Not Plotting
+
+If:
+Frequency is non-zero
+UDP packets are visible on the Pi
+The Logged QSOs layer is enabled
+
+But nothing plots:
+
+Verify "ENABLE_OHC_HTTP": true
+
+Restart the bridge
+
+Look for [OHC] POST ok in bridge.log
