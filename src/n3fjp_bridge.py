@@ -1,5 +1,5 @@
 r"""
-N3FJP -> Time Mapper UDP Bridge (N1MM contactinfo)
+N3FJP UDP Bridge (N1MM contactinfo)
 Version: 1.0.0
 
 - Listens to N3FJP TCP API updates
@@ -22,6 +22,7 @@ Config JSON example:
 
 import socket
 import time
+import sys
 import datetime as dt
 import re
 import os
@@ -49,6 +50,16 @@ OHC_API_KEY       = ""   # optional later
 # Extract complete <CMD>...</CMD> blocks from a stream buffer
 CMD_BLOCK_RE = re.compile(r"<CMD>.*?</CMD>", re.IGNORECASE | re.DOTALL)
 
+def single_instance_guard(port=56789):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("127.0.0.1", port))
+    except OSError:
+        log("Another bridge instance is already running. Exiting.")
+        sys.exit(1)
+    return s
+
+_instance_lock = single_instance_guard()
 
 def _script_dir() -> str:
     try:
@@ -86,6 +97,21 @@ def post_ohc_qso(base_url: str, api_key: str, payload: dict, timeout_sec: float 
         log(f"[OHC] HTTPError {e.code} -> {url} :: {body}")
     except Exception as e:
         log(f"[OHC] POST failed -> {url} :: {e}")
+
+        # Friendly fallback: try :3001 if :3000 refused
+        if ":3000" in base_url:
+            try:
+                alt_base = base_url.replace(":3000", ":3001")
+                alt_url = alt_base.rstrip("/") + "/api/n3fjp/qso"
+                req2 = urllib.request.Request(alt_url, data=data, method="POST")
+                req2.add_header("Content-Type", "application/json")
+                if api_key:
+                    req2.add_header("X-API-Key", api_key)
+                with urllib.request.urlopen(req2, timeout=timeout_sec) as resp:
+                    resp.read()
+                log(f"[OHC] POST ok (fallback) -> {alt_url}")
+            except Exception as e2:
+                log(f"[OHC] POST failed (fallback) -> {alt_url} :: {e2}")
 
 def log(msg: str) -> None:
     global LOG_PATH
@@ -176,6 +202,9 @@ def apply_config() -> None:
         f"UDP={UDP_DEST_IP}:{UDP_DEST_PORT} MYCALL='{MYCALL_FALLBACK}' "
         f"LOG='{LOG_PATH}'"
     )
+
+    log(f"[CONFIG] Loaded from: {os.path.abspath(loaded_from) if loaded_from else '(defaults/no config.json)'}")
+    log(f"[CONFIG] OHC_BASE_URL={OHC_BASE_URL}")
 
 
 def send_cmd(sock: socket.socket, xml: str) -> None:

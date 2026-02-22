@@ -1,5 +1,5 @@
 <# 
-Install-N3FJPTimeMapperBridge.ps1
+Install-N3FJPBridge.ps1
 Version: 1.0.1 (action/working-dir fix)
 
 What it does:
@@ -10,7 +10,7 @@ What it does:
 - Creates Scheduled Task (AtLogOn, runs as current user) using a wrapper .cmd
 
 Run from an elevated PowerShell:
-  PowerShell (Admin) -> cd C:\N3FJP_Proxy -> .\Install-N3FJPTimeMapperBridge.ps1
+  PowerShell (Admin) -> cd C:\N3FJP_Proxy -> .\Install-N3FJPBridge.ps1
 
 If scripts are blocked:
   PowerShell (Admin): Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
@@ -21,8 +21,8 @@ param(
   [int]$N3FJPPort = 1100,
   [string]$MyCall = "",                    # optional override
   [string]$InstallDir = "C:\N3FJP_Proxy",
-  [string]$ScriptName = "n3fjp_to_timemapper_udp.py",
-  [string]$TaskName = "N3FJP Time Mapper UDP Bridge",
+  [string]$ScriptName = "n3fjp_bridge.py",
+  [string]$TaskName = "N3FJP UDP Bridge",
   [int]$ScanTimeoutMs = 250                # per-IP connect timeout
 )
 
@@ -168,7 +168,7 @@ function Create-Or-UpdateTask(
   if (Test-Path $pythonW) { $PythonExe = $pythonW }
 
   # Create a hidden runner .vbs (this is what actually prevents any window)
-  $vbsPath = Join-Path $WorkingDir "Run-N3FJPTimeMapperBridge.vbs"
+  $vbsPath = Join-Path $WorkingDir "Run-N3FJPBridge.vbs"
 
   $vbs = @"
 Set sh = CreateObject("WScript.Shell")

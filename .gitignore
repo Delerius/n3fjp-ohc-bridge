@@ -1,12 +1,6 @@
-﻿# Runtime files
-config.json
-bridge.log
-*.log
-
-# Python
+bin/
+obj/
 __pycache__/
 *.pyc
-
-# Virtual environments
-.venv/
-.env
+.vscode/
+.DS_Store

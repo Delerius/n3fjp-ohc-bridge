@@ -1,152 +1,86 @@
-N3FJP → OpenHamClock / Time Mapper UHD Bridge
+# N3FJP UDP Bridge (Windows)
 
-This project provides a lightweight Python bridge that connects to the N3FJP Logger TCP API
-and forwards newly logged QSOs to:
+This bridge connects **N3FJP Logger (TCP API)** to UDP consumers such as **Time Mapper** and **OpenHamClock** integrations.
 
-OpenHamClock via HTTP (map overlay ingest)
+It listens to the N3FJP TCP API (default **1100**) and forwards QSO updates via UDP (default **12060**).
 
-Time Mapper UHD via UDP (logger feed)
+This bridge is optional and runs independently of OpenHamClock.
 
-This bridge was originally created to feed Time Mapper UHD via UDP, and now also supports OpenHamClock via HTTP.
+---
 
-Features
+## Requirements
 
-Monitors N3FJP Entry fields (callsign / grid)
+- Windows 10/11
+- Python 3.9+ (installed with the `py` launcher)
+- N3FJP Logger with **TCP API enabled** (default port 1100)
+- A UDP consumer (Time Mapper Logger Feed, etc.) listening on UDP port 12060
 
-Detects log (ENTER) events
+---
 
-Reads band, mode, and frequency from N3FJP
+## Quick Install
 
-Sends QSOs to OpenHamClock (optional)
+1. Create folder:
+   ```
+   C:\N3FJP_Proxy
+   ```
 
-Sends UDP logger packets to Time Mapper UHD
+2. Copy these files into that folder:
+   - `n3fjp_bridge.py`
+   - `Install-N3FJPBridge.ps1`
 
-Designed for LAN use (bridge and targets on the same network)
+3. In N3FJP, enable:
+   **Settings → Application Program Interface (API) → TCP API Enabled (Server) Port 1100**
 
-Requirements
+4. Open **PowerShell as Administrator** and run:
+   ```powershell
+   cd C:\N3FJP_Proxy
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   .\Install-N3FJPBridge.ps1
+   ```
 
-Windows 10 / 11
+5. Reboot (or run the scheduled task once to test).
 
-Python 3.9+
+---
 
-N3FJP Logger with TCP API enabled
+## Default Ports
 
-OpenHamClock (optional)
+- N3FJP TCP API: **1100**
+- UDP destination: **127.0.0.1:12060**
 
-Time Mapper UHD (optional)
+---
 
-Quick Start
+## Verify
 
-Copy config.json.example → config.json
+Open:
+```
+C:\N3FJP_Proxy\bridge.log
+```
 
-Edit values for your station and network
+Look for:
+```
+Connected.
+Sent SETUPDATESTATE TRUE
+RX SETUPDATESTATERESPONSE VALUE=TRUE
+```
 
-Run manually:
+Then log a test QSO and look for:
+```
+SENT UDP -> 127.0.0.1:12060
+```
 
-python n3fjp_to_timemapper_udp.py
+---
 
-Output Modes (Important)
+## Configuration
 
-The bridge supports two independent output paths.
+The installer creates:
+```
+C:\N3FJP_Proxy\config.json
+```
 
-1️⃣ UDP Output (Always Enabled)
+If auto-detect fails or your N3FJP IP changes, edit `N3FJP_HOST`.
 
-The bridge sends a minimal N1MM-style <contactinfo> packet to:
+---
 
-UDP_DEST_IP : UDP_DEST_PORT
+## Full Guide
 
-
-This packet includes:
-
-Callsign
-
-Band
-
-Frequency
-
-Mode
-
-My Call
-
-⚠️ Important:
-The UDP payload does not include DX grid information.
-
-If your OpenHamClock instance relies on grid or location data to plot QSOs, UDP alone may not be sufficient.
-
-2️⃣ Optional HTTP POST to OpenHamClock
-
-If your config.json contains:
-
-"ENABLE_OHC_HTTP": true
-
-
-The bridge will also POST structured JSON directly to:
-
-http://<OHC_BASE_URL>/api/n3fjp/qso
-
-
-This payload includes:
-
-dx_call
-
-band_mhz
-
-freq_khz
-
-mode
-
-dx_grid (when available)
-
-de_call (if configured)
-
-If QSOs are not plotting even though UDP packets are arriving, enabling HTTP mode is recommended.
-
-Note: UDP output is still sent even when HTTP mode is enabled. Enabling HTTP allows OpenHamClock to receive additional fields (such as dx_grid when available) that may be required for plotting in some setups.
-
-Troubleshooting: QSOs Not Plotting
-
-If:
-
-Frequency is non-zero in bridge.log
-
-UDP packets are visible on the Pi (via tcpdump)
-
-The "Logged QSOs" layer is enabled in OpenHamClock
-
-But nothing plots:
-
-Verify "ENABLE_OHC_HTTP": true in config.json
-
-Restart the bridge
-
-Look for this line in bridge.log:
-
-[OHC] POST ok -> http://<OHC_BASE_URL>/api/n3fjp/qso
-
-If you see an HTTP error instead, that message will indicate what needs adjustment.
-
-Optional (Highly Recommended Addition)
-
-I would also add this small clarification section — this prevents future CAT confusion:
-
-Important: N3FJP Must Have Live Rig Frequency
-
-The bridge reads live band/mode/frequency via N3FJP’s TCP API.
-
-If N3FJP does not have rig control configured, the API may return:
-
-FREQ=0.0
-
-
-When this occurs, the bridge will skip sending the QSO.
-
-Ensure N3FJP has active CAT/rig control configured at log time.
-
-Copy config.json.example → config.json
-
-Choose one of the example configs:
-- config.ohc.example.json (recommended for OpenHamClock)
-- config.udp-only.example.json (Time Mapper only)
-
-Copy the file you want to use to:
-config.json
+See `UserGuide.md`.
